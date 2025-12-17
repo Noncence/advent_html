@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Адвент для Анечки</title>
+    <style>
+        /* --- Настройки шрифтов и базы --- */
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Lobster&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 10vh;
+            font-family: 'Comfortaa', cursive;
+            overflow-x: hidden;
+        }
+
+        /* --- Фон --- */
+        body {
+            background: url('village.png') no-repeat center center fixed;
+            background-size: cover;
+            background-attachment: scroll;
+            color: #fff;
+            position: relative;
+            min-height: 10vh;
+            height: auto;
+        }
+
+        /* Заголовок */
+        header {
+          text-align: center;
+          padding: 28px 16px 12px;
+        }
+        
+        h1 {
+          font-family: 'Cormorant', serif;
+          font-size: 28px;
+          margin: 0 0 8px;
+        }
+        
+        h2 {
+          font-size: 14px;
+          font-weight: 400;
+          opacity: .75;
+        }
+
+        /* --- Сетка календаря --- */
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px;
+            padding: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Карточка дня */
+        .day-card {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6));
+            animation: float 3.5s ease-in-out infinite;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            height: auto;
+            background: transparent;
+            z-index: 20;
+        }
+
+        /* Заблокированная карточка - ИЗМЕНЕНО: убрали grayscale */
+        .day-card.locked {
+            cursor: not-allowed;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4)) brightness(0.8) saturate(0.8);
+            animation: none;
+            opacity: .4;
+            position: relative;
+        }
+
+        /* Анимация при нажатии на заблокированную карточку */
+        .day-card.locked:active {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+				.day-card.pressed {
+				  transform: scale(0.95) !important;
+				  animation: none !important;
+				  transition: transform 0.1s ease;
+				}
+
+        /* Заблокированные карточки - особый эффект при нажатии */
+        .day-card.locked:active {
+            transform: none;
+        }
+
+        /* Карточка для 31 декабря - ОСОБЫЙ СТИЛЬ */
+        .day-card.center-card {
+            grid-column: 1 / -1;
+            width: 70%;
+            margin: 0 auto;
+            justify-self: center;
+        }
+
+        .card-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Снег поверх карточки - ТЕПЕРЬ ДЛЯ ВСЕХ КАРТОЧЕК */
+        .card-snow-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .card-snowflake {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            text-shadow: 0 0 3px rgba(0,0,0,0.3);
+            animation: cardSnowFall linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes cardSnowFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100% + 20px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Разная задержка анимации карточек */
+        .day-card:nth-child(10) { 
+            animation-delay: 0s; 
+        }
+        .day-card:not(:nth-child(10)):nth-child(3n+1) { animation-delay: 0s; }
+        .day-card:not(:nth-child(10)):nth-child(3n+2) { animation-delay: 0.5s; }
+        .day-card:not(:nth-child(10)):nth-child(3n+3) { animation-delay: 1s; }
+
+        /* Эффект нажатия - УБРАНО, заменено на .day-card:not(.locked):active */
+         .day-card:active {
+            transform: scale(0.92);
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8));
+        } 
+
+        /* Картинки внутри карточек - ИЗМЕНЕНО: убрали фильтр для заблокированных */
+        .day-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background: transparent;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Для 31 декабря - contain чтобы сохранить пропорции */
+        .day-card.center-card img {
+            object-fit: contain;
+        }
+
+        /* Номер дня на карточке */
+        .day-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(192, 57, 43, 0.85);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 30;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Анимация плавания карточек */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- Блок отсчета времени до начала --- */
+        .countdown-container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            display: none;
+        }
+
+        .countdown-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .countdown-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #ffecd1;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .countdown-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .countdown-value {
+            background: rgba(192, 57, 43, 0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            min-width: 50px;
+        }
+
+        .countdown-label {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        /* --- ПОЛНОЭКРАННОЕ ОКНО --- */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .fullscreen-overlay::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('village.png') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        .fullscreen-content {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .fullscreen-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Кнопка "Назад" внизу окна */
+        .back-btn-fullscreen {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #fff;
+            background: rgba(192, 57, 43, 0.8);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            font-family: 'Comfortaa', cursive;
+            font-weight: bold;
+        }
+
+        .back-btn-fullscreen:hover {
+            background: rgba(192, 57, 43, 1);
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        /* Контент внутри полноэкранного окна */
+        .fullscreen-date {
+            font-family: 'Lobster', cursive;
+            font-size: 2.5rem;
+            color: #ffecd1;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+        }
+
+        .fullscreen-image {
+            width: 90%;
+            max-width: 500px;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 3px solid #c0392b;
+        }
+
+        .fullscreen-text {
+            font-size: 1.3rem;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            max-width: 600px;
+            padding: 0 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .gift-box-fullscreen {
+            background: rgba(232, 245, 233, 0.9);
+            border: 3px dashed #4caf50;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 1.4rem;
+            max-width: 600px;
+            margin: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Основной снег на фоне - ЗАМЕДЛЕННЫЙ */
+        .snowflake {
+            position: fixed;
+            top: -20px;
+            color: #fff;
+            font-size: 1em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 2px rgba(0,0,0,0.6);
+            z-index: 1;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* Снег внутри полноэкранного окна - ЗАМЕДЛЕННЫЙ */
+        .modal-snowflake {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            text-shadow: 0 0 3px rgba(0,0,0,0.3);
+            animation: modalSnowFall linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes modalSnowFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 20px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            .fullscreen-date {
+                font-size: 2rem;
+                margin-top: 20px;
+            }
+            
+            .fullscreen-text {
+                font-size: 1.1rem;
+                max-height: 50vh;
+            }
+            
+            .gift-box-fullscreen {
+                font-size: 1.2rem;
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .back-btn-fullscreen {
+                bottom: 20px;
+                padding: 10px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .fullscreen-content {
+                padding: 10px;
+                justify-content: flex-start;
+                padding-top: 20px;
+            }
+            
+            .day-number {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+                top: 8px;
+                left: 8px;
+            }
+            
+            .day-card.center-card {
+                height: 70%;
+            }
+            
+            .countdown-timer {
+                font-size: 1.2rem;
+            }
+            
+            .countdown-value {
+                min-width: 40px;
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .fullscreen-date {
+                font-size: 1.8rem;
+            }
+            
+            .fullscreen-text {
+                font-size: 1rem;
+            }
+            
+            .calendar-container {
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .day-card.center-card {
+                width: 50%;
+            }
+            
+            .countdown-timer {
+                font-size: 1rem;
+                gap: 10px;
+            }
+            
+            .countdown-value {
+                min-width: 35px;
+                padding: 5px 8px;
+            }
+        }
+
+        /* Стили для скролла текста */
+        .fullscreen-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .fullscreen-text::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .fullscreen-text::-webkit-scrollbar-thumb {
+            background: rgba(192, 57, 43, 0.5);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+<!-- Остальной код остается без изменений -->
+<header>
+    <h1>Крошечка, этот календарь — для тебя ❤️</h1>
+    <h2>Маленькие сюрпризы с 22 по 31 декабря</h2>
+</header>
+
+    <!-- Блок отсчета времени до начала -->
+    <div class="countdown-container" id="countdownContainer">
+        <div class="countdown-title">До начала волшебного календаря осталось:</div>
+        <div class="countdown-timer" id="countdownTimer">
+            <div class="countdown-unit">
+                <div class="countdown-value" id="days">0</div>
+                <div class="countdown-label">дней</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-value" id="hours">0</div>
+                <div class="countdown-label">часов</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-value" id="minutes">0</div>
+                <div class="countdown-label">минут</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-container" id="calendar">
+        <!-- Карточки будут сгенерированы скриптом -->
+    </div>
+
+    <!-- Полноэкранное окно вместо модального -->
+    <div class="fullscreen-overlay" id="fullscreenModal">
+        <div class="fullscreen-content">
+            <button class="back-btn-fullscreen" onclick="closeFullscreenModal()">← Назад</button>
+            <div class="fullscreen-date" id="fs-date"></div>
+            <img src="" class="fullscreen-image" id="fs-img" alt="Фото дня" style="display: none;">
+            <div class="fullscreen-text" id="fs-text"></div>
+            <div class="gift-box-fullscreen" id="fs-gift"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- КОНСТАНТЫ И НАСТРОЙКИ ---
+        const START_DAY = 1 ; // 22 декабря
+        const START_MONTH = 11; // Декабрь (0-11)
+        const CURRENT_YEAR = new Date().getFullYear();
+        
+        // --- ДАННЫЕ КАЛЕНДАРЯ ---
+        const adventData = [
+            { day: 2, img: "22.png", text: "Начинаем наш волшебный отсчет! Пусть этот день будет уютным.", gift: "Любимая шоколадка и обнимашки", contentImg: "" },
+            { day: 23, img: "23.png", text: "Посмотри на небо, звезды светят только для тебя!", gift: "Билеты на новогодний фильм", contentImg: "" },
+            { day: 24, img: "24.png", text: "За этим окошком прячется маленькое чудо.", gift: "Расслабляющий массаж вечером", contentImg: "" },
+            { day: 25, img: "25.png", text: "Тепло нашего дома согревает даже в морозы.", gift: "Вкусный ужин при свечах", contentImg: "" },
+            { day: 26, img: "26.png", text: "Праздник к нам приходит! Чувствуешь?", gift: "Милая новогодняя открытка", contentImg: "" },
+            { day: 27, img: "27.png", text: "Старый домик хранит много секретов...", gift: "Сертификат в Золотое Яблоко", contentImg: "" },
+            { day: 28, img: "28.png", text: "Загадай желание, пока горит эта звезда.", gift: "Теплые и пушистые носочки", contentImg: "" },
+            { day: 29, img: "29.png", text: "Совсем скоро все желания сбудутся!", gift: "Книга, о которой ты мечтала", contentImg: "" },
+            { day: 30, img: "30.png", text: "Предпоследний шаг... Волнение нарастает!", gift: "Много-много мандаринов!", contentImg: "" },
+            { day: 31, img: "31.png", text: "УРА! С НАСТУПАЮЩИМ НОВЫМ ГОДОМ, ЛЮБИМАЯ!", gift: "🎁 ГЛАВНЫЙ СЮРПРИЗ ПОД ЁЛКОЙ! 🎁", contentImg: "" }
+        ];
+
+        const container = document.getElementById('calendar');
+        const fullscreenModal = document.getElementById('fullscreenModal');
+        const fsDate = document.getElementById('fs-date');
+        const fsText = document.getElementById('fs-text');
+        const fsGift = document.getElementById('fs-gift');
+        const fsImg = document.getElementById('fs-img');
+        const countdownContainer = document.getElementById('countdownContainer');
+        const countdownTimer = document.getElementById('countdownTimer');
+
+        // Переменная для хранения состояния скролла основной страницы
+        let scrollPosition = 0;
+
+        // --- ФУНКЦИИ ДЛЯ РАБОТЫ С ДАТАМИ ---
+        
+        // Проверяет, доступна ли карточка для данного дня
+        function isCardAvailable(cardDay) {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth(); // 0-11
+            const currentDay = now.getDate();
+            
+            // Если текущий месяц раньше декабря (ноябрь или ранее)
+            if (currentMonth < START_MONTH) {
+                return false;
+            }
+            
+            // Если текущий месяц - декабрь
+            if (currentMonth === START_MONTH) {
+                // Карточка доступна только если текущий день >= номеру дня карточки
+                // И начинается с 22 декабря
+                return currentDay >= cardDay && currentDay >= START_DAY;
+            }
+            
+            // Если текущий месяц позже декабря (январь следующего года)
+            // Все карточки становятся доступными
+            return true;
+        }
+        
+        // Проверяет, начался ли уже календарь (22 декабря или позже)
+        function hasCalendarStarted() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentDay = now.getDate();
+            
+            // Если текущий месяц - декабрь и день >= 22
+            if (currentMonth === START_MONTH && currentDay >= START_DAY) {
+                return true;
+            }
+            
+            // Если месяц после декабря
+            if (currentMonth > START_MONTH) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Рассчитывает время до начала календаря (до 22 декабря)
+        function getTimeUntilStart() {
+            const now = new Date();
+            const startDate = new Date(CURRENT_YEAR, START_MONTH, START_DAY);
+            
+            // Если сейчас уже после 22 декабря этого года
+            if (now > startDate) {
+                // Показываем календарь, отсчет не нужен
+                return null;
+            }
+            
+            const diff = startDate - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            return { days, hours, minutes };
+        }
+        
+        // Обновляет отсчет времени
+        function updateCountdown() {
+            const timeUntilStart = getTimeUntilStart();
+            
+            if (timeUntilStart) {
+                countdownContainer.classList.add('active');
+                document.getElementById('days').textContent = timeUntilStart.days;
+                document.getElementById('hours').textContent = timeUntilStart.hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = timeUntilStart.minutes.toString().padStart(2, '0');
+            } else {
+                countdownContainer.classList.remove('active');
+            }
+        }
+        
+        // --- Генерация карточек с эффектом снега ---
+        adventData.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            card.style.animationDelay = `${index * 0.1}s, ${index % 3 * 0.5}s`;
+            card.dataset.day = item.day;
+            
+            // Проверяем доступность карточки
+            const isAvailable = isCardAvailable(item.day);
+            
+            // Для 31 декабря добавляем особый класс
+            if (item.day === 31) {
+                card.classList.add('center-card');
+            }
+            
+            // Добавляем класс locked для заблокированных карточек
+            if (!isAvailable) {
+                card.classList.add('locked');
+            }
+
+            // Номер дня на карточке
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.innerText = item.day;
+            card.appendChild(dayNumber);
+
+            // Изображение карточки
+            const img = document.createElement('img');
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                img.src = this.src;
+                // Если изображение прозрачное, добавляем легкую тень для лучшей видимости
+                if (item.day !== 31) {
+                    img.style.filter = 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))';
+                }
+                
+                // УБРАЛИ: фильтр серого для заблокированных карточек
+                // Теперь только эффект через CSS-класс .locked
+            };
+            tempImg.onerror = function() {
+                img.src = `https://via.placeholder.com/300x450/ff9a9e/fad0c4?text=День+${item.day}`;
+                img.style.filter = 'none';
+            };
+            tempImg.src = item.img;
+            img.alt = `День ${item.day}`;
+            img.loading = "lazy";
+            
+            // Обертка для содержимого (особенно для 31 декабря)
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'card-content';
+            contentWrapper.appendChild(img);
+            card.appendChild(contentWrapper);
+
+            // ИЗМЕНЕНО: Создаем снег поверх ВСЕХ карточек (включая заблокированные)
+            const snowOverlay = document.createElement('div');
+            snowOverlay.className = 'card-snow-overlay';
+            snowOverlay.id = `snow-overlay-${item.day}`;
+            card.appendChild(snowOverlay);
+
+            // Обработчик клика
+            card.addEventListener('click', () => {
+                if (isAvailable) {
+                    openFullscreenModal(item);
+                } else {
+                    // Анимация "нельзя открыть" для заблокированных карточек
+                    card.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        card.style.animation = '';
+                    }, 500);
+                }
+            });
+
+            container.appendChild(card);
+            
+            // ИЗМЕНЕНО: Запускаем снег на ВСЕХ карточках (включая заблокированные)
+            setTimeout(() => {
+                startCardSnow(item.day);
+            }, 500 + index * 100);
+        });
+
+        // --- Функция создания снега на карточке ---
+        function startCardSnow(day) {
+            const overlay = document.getElementById(`snow-overlay-${day}`);
+            if (!overlay) return;
+            
+            // Очищаем предыдущий снег
+            overlay.innerHTML = '';
+            
+            // Создаем снежинки на карточке
+            const snowflakeCount = 2 + Math.floor(Math.random() * 3);
+            
+            for (let i = 0; i < snowflakeCount; i++) {
+                setTimeout(() => {
+                    createCardSnowflake(day);
+                }, i * 1000);
+            }
+            
+            // Периодически добавляем новые снежинки
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    createCardSnowflake(day);
+                }
+            }, 5000);
+        }
+
+        function createCardSnowflake(day) {
+            const overlay = document.getElementById(`snow-overlay-${day}`);
+            if (!overlay) return;
+            
+            const snowflake = document.createElement('div');
+            snowflake.className = 'card-snowflake';
+            snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
+            
+            // Случайная позиция
+            snowflake.style.left = Math.random() * 100 + '%';
+            
+            // Размер снежинки
+            const size = 6 + Math.random() * 6;
+            snowflake.style.fontSize = size + 'px';
+            
+            // Скорость падения
+            const duration = 5 + Math.random() * 5;
+            snowflake.style.animationDuration = duration + 's';
+            
+            // Задержка начала
+            snowflake.style.animationDelay = Math.random() * 2 + 's';
+            
+            // Прозрачность - для заблокированных карточек снежинки более прозрачные
+            const card = document.querySelector(`.day-card[data-day="${day}"]`);
+            if (card && card.classList.contains('locked')) {
+                snowflake.style.opacity = 0.3 + Math.random() * 0.3;
+                snowflake.style.color = 'rgba(173, 216, 230, 0.7)'; // Голубоватый оттенок
+            } else {
+                snowflake.style.opacity = 0.5 + Math.random() * 0.5;
+            }
+            
+            overlay.appendChild(snowflake);
+            
+            // Удаляем снежинку после анимации
+            setTimeout(() => {
+                if (snowflake.parentNode === overlay) {
+                    snowflake.remove();
+                }
+            }, (duration + 2) * 1000);
+        }
+
+        // --- Снег внутри модального окна ---
+        function startModalSnow() {
+            if (!fullscreenModal.classList.contains('active')) return;
+            
+            const modalContent = document.querySelector('.fullscreen-content');
+            
+            // Создаем снежинки в модальном окне
+            const createModalSnowflake = () => {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'modal-snowflake';
+                snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
+                
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.fontSize = (10 + Math.random() * 15) + 'px';
+                snowflake.style.animationDuration = (8 + Math.random() * 8) + 's';
+                snowflake.style.animationDelay = Math.random() * 3 + 's';
+                snowflake.style.opacity = 0.4 + Math.random() * 0.4;
+                
+                modalContent.appendChild(snowflake);
+                
+                setTimeout(() => {
+                    if (snowflake.parentNode === modalContent) {
+                        snowflake.remove();
+                    }
+                }, 15000);
+            };
+            
+            // Создаем несколько снежинок сразу
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createModalSnowflake, i * 500);
+            }
+            
+            // Интервал для создания новых снежинок
+            const modalSnowInterval = setInterval(() => {
+                if (fullscreenModal.classList.contains('active')) {
+                    createModalSnowflake();
+                } else {
+                    clearInterval(modalSnowInterval);
+                }
+            }, 1500);
+        }
+
+        // --- Функции полноэкранного окна ---
+        function openFullscreenModal(item) {
+            // Сохраняем позицию скролла
+            scrollPosition = window.pageYOffset;
+            
+            // Блокируем скролл основной страницы
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollPosition}px`;
+            document.body.style.width = '100%';
+            
+            // Показываем контент
+            fsDate.innerText = item.day + " Декабря";
+            fsText.innerText = item.text;
+            fsGift.innerHTML = "🎄 " + item.gift;
+            
+            if (item.contentImg && item.contentImg !== "") {
+                fsImg.src = item.contentImg;
+                fsImg.style.display = "block";
+            } else {
+                fsImg.style.display = "none";
+            }
+
+            fullscreenModal.classList.add('active');
+            fsText.scrollTop = 0;
+            
+            // Запускаем снег в модальном окне
+            setTimeout(startModalSnow, 300);
+        }
+
+        function closeFullscreenModal() {
+            fullscreenModal.classList.remove('active');
+            
+            // Разблокируем скролл основной страницы
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('position');
+            document.body.style.removeProperty('top');
+            document.body.style.removeProperty('width');
+            
+            // Восстанавливаем позицию скролла
+            window.scrollTo(0, scrollPosition);
+            
+            // Очищаем снег в модальном окне
+            const modalSnowflakes = document.querySelectorAll('.modal-snowflake');
+            modalSnowflakes.forEach(snowflake => snowflake.remove());
+        }
+
+        // Закрытие по клику вне контента
+        fullscreenModal.addEventListener('click', (e) => {
+            if (e.target === fullscreenModal) closeFullscreenModal();
+        });
+
+        // Закрытие по клавише ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && fullscreenModal.classList.contains('active')) {
+                closeFullscreenModal();
+            }
+        });
+
+        // --- Основной снег на фоне - ЗАМЕДЛЕННЫЙ ---
+        function createSnow() {
+            const snowflake = document.createElement('div');
+            snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
+            snowflake.classList.add('snowflake');
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.animationDuration = (Math.random() * 8 + 15) + 's';
+            snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+            snowflake.style.fontSize = Math.random() * 15 + 8 + 'px';
+            
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 12000);
+        }
+
+        // Запускаем снегопад на фоне
+        setTimeout(() => {
+            setInterval(createSnow, 500);
+        }, 1000);
+
+        // --- ИНИЦИАЛИЗАЦИЯ ОТСЧЕТА ВРЕМЕНИ ---
+        
+        // Проверяем, нужно ли показывать отсчет
+        updateCountdown();
+        
+        // Обновляем отсчет каждую минуту
+        setInterval(updateCountdown, 60000);
+        
+        // Также обновляем при загрузке страницы
+        window.addEventListener('load', updateCountdown);
+
+        // Предотвращаем масштабирование на мобильных
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+    </script>
+</body>
+</html>
