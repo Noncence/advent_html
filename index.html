@@ -78,10 +78,19 @@
             overflow: hidden;
             width: 100%;
             height: auto;
+            min-height: 170px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             z-index: 20;
+        }
+
+        /* Карточка скрытая (для 1 января) */
+        .day-card.hidden-card {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         /* Заблокированная карточка */
@@ -109,12 +118,6 @@
             transform: scale(0.95) !important;
             animation: none !important;
             transition: transform 0.1s ease;
-        }
-
-        /* Карточка для 31 декабря - ОСОБЫЙ СТИЛЬ */
-        .day-card.center-card {
-            justify-self: center;
-            grid-column: 2/3;
         }
 
         .card-content {
@@ -184,13 +187,6 @@
             /* Убран filter: drop-shadow */
         }
 
-        /* Для 31 декабря - contain чтобы сохранить пропорции */
-        .day-card.center-card img {
-            object-fit: contain;
-            padding-top: 25px;
-            width: 100%;
-        }
-
         /* Номер дня на карточке */
         .day-number {
             position: absolute;
@@ -209,6 +205,15 @@
             z-index: 30;
             box-shadow: 0 3px 8px rgba(0,0,0,0.4);
             font-family: 'Lobster', cursive;
+        }
+
+        /* Стили для секретной карточки */
+        .day-card[data-day="1"][data-month="0"] .day-number {
+            background: linear-gradient(45deg, #8e44ad, #9b59b6);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            width: 42px;
+            height: 42px;
         }
 
         /* Анимация плавания карточек */
@@ -244,6 +249,45 @@
 
         .content-page.active {
             transform: translateY(0);
+        }
+
+        /* Стили для секретного контента - текст такой же как в обычных карточках */
+        .content-page.secret-content .content-text {
+            font-size: 1.1rem; /* ТАКОЙ ЖЕ РАЗМЕР как в обычных карточках */
+            line-height: 1.4;
+            max-height: none;
+            height: calc(100vh - 250px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            margin: 20px;
+            width: calc(100% - 40px);
+            box-sizing: border-box;
+            text-align: center;
+            overflow-y: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            white-space: pre-line;
+        }
+
+        .content-page.secret-content .content-date {
+            font-size: 2.5rem;
+            color: #ffecd1;
+            text-shadow: 0 0 15px rgba(255, 236, 209, 0.5);
+            margin-top: 20px;
+        }
+
+        .content-page.secret-content .content-gift {
+            background: rgba(142, 68, 173, 0.9);
+            border: 3px dashed #ffecd1;
+            color: #ffecd1;
+            font-size: 1.2rem;
+            margin-top: 20px;
         }
 
 				.fullscreen-content {
@@ -327,6 +371,10 @@
 				    display: flex;
 				    align-items: center;
 				    justify-content: center;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                    hyphens: auto;
+                    white-space: pre-line;
 				}
 
 				.content-gift {
@@ -344,6 +392,7 @@
 				    box-sizing: border-box;
 				    text-align: center;
 				    flex-shrink: 0; /* не сжимается */
+				    position: relative;
 				}
 
 				/* Скрытое состояние подарка - поверх существующих стилей */
@@ -545,6 +594,342 @@
             to { opacity: 1; }
         }
 
+        /* Стили для окна пароля (в стиле сайта) */
+        .password-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background:url('village.png') no-repeat center top;
+            padding: 25px 20px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: auto;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-sizing: border-box;
+        }
+        
+        .password-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .password-title {
+            font-family: 'Lobster', cursive;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ffecd1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Comfortaa', cursive;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+            color: #2c3e50;
+            border: 2px solid #ffecd1;
+            box-sizing: border-box;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .password-submit {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .password-submit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+        
+        .password-cancel {
+            background: transparent;
+            color: #ffecd1;
+            border: 2px solid #ffecd1;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .password-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .password-error {
+            color: #ffecd1;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+            display: none;
+            background: rgba(231, 76, 60, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .password-error.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .password-hint {
+            color: rgba(255, 236, 209, 0.8);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Окно пароля для подарка */
+        .gift-password-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background:url('village.png') no-repeat center top;
+            padding: 25px 20px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 300px;
+            z-index: 2001;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 236, 209, 0.5);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-sizing: border-box;
+        }
+        
+        .gift-password-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .gift-password-title {
+            font-family: 'Lobster', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffecd1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .gift-password-input {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Comfortaa', cursive;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+            color: #2c3e50;
+            border: 2px solid #ffecd1;
+            box-sizing: border-box;
+        }
+        
+        .gift-password-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .gift-password-submit {
+            background: linear-gradient(to right, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .gift-password-submit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+        }
+        
+        .gift-password-cancel {
+            background: transparent;
+            color: #ffecd1;
+            border: 2px solid #ffecd1;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .gift-password-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .gift-password-error {
+            color: #ffecd1;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+            display: none;
+            background: rgba(231, 76, 60, 0.8);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gift-password-error.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .gift-password-hint {
+            color: rgba(255, 236, 209, 0.8);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Секретная кнопка для показа карточки 1 января */
+        .secret-button {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(142, 68, 173, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .secret-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        }
+        
+        .secret-button.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ ТЕКСТОВОЙ НАВИГАЦИИ СЕКРЕТНОЙ КАРТОЧКИ */
+        .text-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .text-nav-btn {
+            background: rgba(142, 68, 173, 0.7);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-family: 'Comfortaa', cursive;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .text-nav-btn:hover:not(:disabled) {
+            background: rgba(142, 68, 173, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .text-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .text-counter {
+            color: #ffecd1;
+            font-size: 0.9rem;
+            min-width: 60px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .secret-text-pages {
+            display: none;
+            width: 100%;
+        }
+        
+        .secret-text-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            width: 100%;
+        }
+        
+        .secret-text-page.active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
             h1 {
@@ -569,8 +954,10 @@
                 left: 10px;
             }
             
-            .day-card.center-card {
-                width: auto;
+            .day-card[data-day="1"][data-month="0"] .day-number {
+                width: 35px;
+                height: 35px;
+                font-size: 10px;
             }
             
             .fullscreen-content {
@@ -599,6 +986,14 @@
 				        margin: 8px auto;
 				    }
 				    
+            .content-page.secret-content .content-text {
+                font-size: 1rem;
+                padding: 15px;
+                height: calc(100vh - 220px);
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+            
 				    .content-gift {
 				        font-size: 1.1rem;
 				        padding: 12px;
@@ -649,6 +1044,67 @@
                 font-size: 1rem;
                 padding: 8px;
             }
+            
+            .password-container {
+                padding: 20px;
+                width: 85%;
+            }
+            
+            .password-title {
+                font-size: 1.6rem;
+            }
+            
+            .password-input {
+                padding: 12px;
+                font-size: 1.1rem;
+            }
+            
+            .password-submit {
+                padding: 12px 24px;
+                font-size: 1.1rem;
+            }
+            
+            .gift-password-container {
+                padding: 20px;
+                width: 80%;
+            }
+            
+            .gift-password-title {
+                font-size: 1.5rem;
+            }
+            
+            .gift-password-input {
+                padding: 10px;
+                font-size: 1rem;
+            }
+            
+            .gift-password-submit {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            .secret-button {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .content-page.secret-content .content-date {
+                font-size: 2rem;
+            }
+            
+            .text-nav-btn {
+                width: 35px;
+                height: 35px;
+                font-weight: 800;
+                font-size: 18px;
+            }
+            
+            .text-counter {
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -666,8 +1122,10 @@
                 padding-bottom: 25px;
             }
             
-            .day-card.center-card {
-                width: auto;
+            .day-card[data-day="1"][data-month="0"] .day-number {
+                width: 30px;
+                height: 30px;
+                font-size: 9px;
             }
             
             .gallery-dots {
@@ -685,9 +1143,18 @@
             }
             
             .content-text {
-                font-size: 1rem;
-                padding: 12px;
+                font-size: 0.95rem;
+                padding: 10px;
                 margin: 0 auto 15px auto;
+                max-height: 20vh;
+            }
+            
+            .content-page.secret-content .content-text {
+                font-size: 0.95rem;
+                padding: 12px;
+                height: calc(100vh - 200px);
+                margin: 8px;
+                width: calc(100% - 16px);
             }
             
             .countdown-timer {
@@ -713,6 +1180,72 @@
                 font-size: 0.9rem;
                 padding: 6px;
             }
+            
+            .password-container {
+                padding: 15px;
+                width: 80%;
+            }
+            
+            .password-title {
+                font-size: 1.4rem;
+            }
+            
+            .password-input {
+                padding: 10px;
+                font-size: 1rem;
+            }
+            
+            .password-submit {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            .gift-password-container {
+                padding: 15px;
+                width: 85%;
+            }
+            
+            .gift-password-title {
+                font-size: 1.3rem;
+            }
+            
+            .gift-password-input {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            
+            .gift-password-submit {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .secret-button {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .content-page.secret-content .content-date {
+                font-size: 1.8rem;
+            }
+            
+            .content-page.secret-content .content-gift {
+                font-size: 1.1rem;
+                padding: 10px;
+            }
+            
+            .text-nav-btn {
+                width: 30px;
+                height: 30px;
+                font-weight: 800;
+                font-size: 16px;
+            }
+            
+            .text-counter {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -720,7 +1253,7 @@
     <div class="main-container">
         <header>
             <h1>Крошечка, этот календарь — для тебя ❤️</h1>
-            <h2>Маленькие сюрпризы с 22 по 31 декабря</h2>
+            <h2>Маленькие сюрпризы с 22 декабря по 1 января</h2>
         </header>
 
         <!-- Блок отсчета времени до начала -->
@@ -766,23 +1299,69 @@
                 <div class="gallery-dots" id="gallery-dots" style="display: none;"></div>
             </div>
             
+            <!-- Блок для текстовой навигации (только для секретной карточки) -->
+            <div class="secret-text-pages" id="secretTextPages">
+                <!-- Текстовые страницы будут добавлены динамически -->
+            </div>
+            
+            <!-- Блок навигации по текстам (только для секретной карточки) -->
+            <div class="text-navigation" id="textNavigation" style="display: none;">
+                <button class="text-nav-btn" id="prevTextBtn" onclick="prevSecretText()" disabled><</button>
+                <div class="text-counter" id="textCounter">1/7</div>
+                <button class="text-nav-btn" id="nextTextBtn" onclick="nextSecretText()">></button>
+            </div>
+            
+            <!-- Обычный текст для обычных карточек -->
             <div class="content-text" id="content-text"></div>
-						<div class="content-gift hidden" id="content-gift" onclick="revealGift(this)">
-						    <div class="gift-hidden-text">🎁 Нажми, чтобы открыть подарок 🎁</div>
-						    <div class="gift-real-text" style="display: none;"></div>
-						</div>
+            
+            <div class="content-gift hidden" id="content-gift" onclick="openGiftPasswordOverlay()">
+                <div class="gift-hidden-text">🎁 Нажми, чтобы открыть подарок 🎁</div>
+                <div class="gift-real-text" style="display: none;"></div>
+            </div>
         </div>
     </div>
+    
+    <!-- Окно для пароля на карточку (в стиле сайта) -->
+    <div class="password-container" id="passwordContainer">
+        <div class="password-title">Введите пароль</div>
+        <input type="text" class="password-input" id="passwordInput" placeholder="Введите секретный пароль...">
+        <button class="password-submit" onclick="checkPassword()">Открыть</button>
+        <button class="password-cancel" onclick="hidePasswordOverlay()">Отмена</button>
+        <div class="password-error" id="passwordError">Неверный пароль. Попробуйте еще раз.</div>
+        <div class="password-hint">Подсказка: 🛍</div>
+    </div>
+    
+    <!-- Окно для пароля на подарок -->
+    <div class="gift-password-container" id="giftPasswordContainer">
+        <div class="gift-password-title">Пароль для подарка</div>
+        <input type="text" class="gift-password-input" id="giftPasswordInput" placeholder="Введите пароль для подарка...">
+        <button class="gift-password-submit" onclick="checkGiftPassword()">Открыть подарок</button>
+        <button class="gift-password-cancel" onclick="hideGiftPasswordOverlay()">Отмена</button>
+        <div class="gift-password-error" id="giftPasswordError">Неверный пароль. Попробуйте еще раз.</div>
+        <div class="gift-password-hint">Подсказка: ❤️</div>
+    </div>
+    
+    <!-- Секретная кнопка для показа карточки 1 января -->
+    <button class="secret-button" id="secretButton" title="Открыть секретную карточку">🎁</button>
 
     <script>
         // --- КОНСТАНТЫ И НАСТРОЙКИ ---
         const START_DAY = 22; // Начало адвента - 22 декабря
         const START_MONTH = 11; // Декабрь (0-11)
         const CURRENT_YEAR = new Date().getFullYear();
+        const PASSWORD = "290386"; // Пароль для карточки 1 января
+        const GIFT_PASSWORD = "0000"; // Пароль для подарка (28 июля)
         
         // Переменные для управления галереей
         let currentPhotoIndex = 0;
         let photoList = [];
+        let january1Card = null; // Ссылка на карточку 1 января
+        let currentItemForGift = null; // Текущий элемент для которого запрашивается пароль подарка
+        
+        // Переменные для управления текстовой навигацией
+        let currentTextIndex = 0;
+        let totalTextPages = 0;
+        let isSecretCard = false;
 
         // --- ДАННЫЕ КАЛЕНДАРЯ ---
         const adventData = [
@@ -805,7 +1384,7 @@
             { 
                 day: 24, 
                 img: "24.png", 
-                text: "Ты моë маленькое чудо... Мы ждали лета, гуляли, и у нас даже был наш личный фотограф)",
+                text: "Ты моë маленькое чудо... Мы ждали лета, гуляли, и у нас даже был наш личный фотограф)", 
                 gift: "Возьми подарок под ëлочкой, пусть он тебя радует как и я)", 
                 contentImg: "img/24-1.webp",
                 extraImages: ["img/24-2.webp", "img/24-3.webp", "img/24-4.webp"]
@@ -821,7 +1400,7 @@
             { 
                 day: 26, 
                 img: "26.png", 
-                text: "Клянусь...! Дорогая моя и любимая! Сегодня я стою перед тобой с открытым сердцем, которое с каждым ударом шепчет твоë имя...", 
+                text: "Клянусь...! Дорогая моя и любимая! Сегодня я стою перед тобой с открытым сердцем которое с каждым ударом шепчет твоë имя...", 
                 gift: "Подарок ждёт тебя на ëлочке, моя жена)", 
                 contentImg: "img/26-1.webp",
                 extraImages: ["img/26-2.webp", "img/26-3.webp", "img/26-4.webp", "img/26-5.webp"]
@@ -865,6 +1444,26 @@
                 gift: "🎁 ГЛАВНЫЙ СЮРПРИЗ ПОД ЁЛКОЙ! 🎁", 
                 contentImg: "img/31-1.webp",
                 extraImages: ["img/31-2.webp", "img/31-3.webp"]
+            },
+            { 
+                day: 1, 
+                month: 0, // Январь (0-11)
+                img: "santa.png", 
+                // Массив текстов для секретной карточки
+                texts: [
+                    "С Новым Годом, моя любимая! ❤️",
+                    "Это первый день нового года, и я хочу, чтобы он стал началом новых чудес, радости и счастья в нашей жизни.",
+                    "Пусть каждый день будет наполнен любовью, улыбками и теплом наших сердец.",
+                    "Я бесконечно благодарен судьбе за тебя и за наше маленькое чудо!",
+                    "Ты сделала меня самым счастливым человеком на земле.",
+                    "Давай пообещаем друг другу, что этот год будет ещё лучше, чем предыдущий!",
+                    "Секретная карта - это особенный сюрприз только для тебя, моя единственная! 💖"
+                ],
+                gift: "🎁 СЕКРЕТНЫЙ НОВОГОДНИЙ ПОДАРОК 🎁<br><br>Твой самый особенный подарок ждёт тебя!", 
+                contentImg: null,
+                extraImages: [],
+                requiresPassword: true,
+                hiddenByDefault: true // Флаг, что карточка скрыта по умолчанию
             }
         ];
 
@@ -877,6 +1476,21 @@
         const countdownTimer = document.getElementById('countdownTimer');
         const calendarStartedMessage = document.getElementById('calendarStartedMessage');
         const currentDayInfo = document.getElementById('currentDayInfo');
+        const passwordContainer = document.getElementById('passwordContainer');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordError = document.getElementById('passwordError');
+        const secretButton = document.getElementById('secretButton');
+        const giftPasswordContainer = document.getElementById('giftPasswordContainer');
+        const giftPasswordInput = document.getElementById('giftPasswordInput');
+        const giftPasswordError = document.getElementById('giftPasswordError');
+        const secretTextPages = document.getElementById('secretTextPages');
+        const textNavigation = document.getElementById('textNavigation');
+        const prevTextBtn = document.getElementById('prevTextBtn');
+        const nextTextBtn = document.getElementById('nextTextBtn');
+        const textCounter = document.getElementById('textCounter');
+        
+        // Переменная для хранения текущей карточки, требующей пароль
+        let currentPasswordItem = null;
 
         // Переменная для хранения состояния прокрутки
         let scrollPosition = 0;
@@ -885,11 +1499,18 @@
         // --- ФУНКЦИИ ДЛЯ РАБОТЫ С ДАТАМИ ---
         
         // Проверяет, доступна ли карточка для данного дня
-        function isCardAvailable(cardDay) {
+        function isCardAvailable(cardDay, cardMonth = START_MONTH) {
             const now = new Date();
             const currentYear = now.getFullYear();
             const currentMonth = now.getMonth(); // 0-11
             const currentDay = now.getDate();
+            
+            // Если карточка для 1 января
+            if (cardMonth === 0 && cardDay === 1) {
+                // Карточка 1 января всегда недоступна при первой загрузке
+                // Она станет доступной только через специальную кнопку
+                return false;
+            }
             
             // Если текущий месяц раньше декабря (ноябрь или ранее)
             if (currentMonth < START_MONTH) {
@@ -999,26 +1620,34 @@
         adventData.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'day-card';
-            card.style.animationDelay = `${index * 0.1}s, ${index % 3 * 0.5}s`;
-            card.dataset.day = item.day;
             
-            // Проверяем доступность карточки
-            const isAvailable = isCardAvailable(item.day);
-            
-            // Для 31 декабря добавляем особый класс
-            if (item.day === 31) {
-                card.classList.add('center-card');
+            // Если это карточка 1 января, добавляем специальный класс для скрытия
+            if (item.day === 1 && item.month === 0) {
+                card.classList.add('hidden-card');
+                january1Card = card; // Сохраняем ссылку на карточку
             }
             
+            card.style.animationDelay = `${index * 0.1}s, ${index % 3 * 0.5}s`;
+            card.dataset.day = item.day;
+            card.dataset.month = item.month !== undefined ? item.month : START_MONTH;
+            
+            // Проверяем доступность карточки
+            const isAvailable = isCardAvailable(item.day, item.month);
+            
             // Добавляем класс locked для заблокированных карточек
-            if (!isAvailable) {
+            if (!isAvailable && !(item.day === 1 && item.month === 0)) {
                 card.classList.add('locked');
             }
 
             // Номер дня на карточке
             const dayNumber = document.createElement('div');
             dayNumber.className = 'day-number';
-            dayNumber.innerText = item.day;
+            // Если это секретная карточка 1 января, показываем "Secret"
+            if (item.day === 1 && item.month === 0) {
+                dayNumber.innerText = "Secret";
+            } else {
+                dayNumber.innerText = item.day;
+            }
             card.appendChild(dayNumber);
 
             // Изображение карточки
@@ -1040,16 +1669,26 @@
             contentWrapper.appendChild(img);
             card.appendChild(contentWrapper);
 
-            // Создаем снег поверх карточек
-            const snowOverlay = document.createElement('div');
-            snowOverlay.className = 'card-snow-overlay';
-            snowOverlay.id = `snow-overlay-${item.day}`;
-            card.appendChild(snowOverlay);
+            // Создаем снег поверх карточек (но не для карточки 1 января)
+            if (item.day !== 1 || item.month !== 0) {
+                const snowOverlay = document.createElement('div');
+                snowOverlay.className = 'card-snow-overlay';
+                snowOverlay.id = `snow-overlay-${item.day}`;
+                card.appendChild(snowOverlay);
+            }
 
             // Обработчики событий для карточек
             if (isAvailable) {
                 // Для разблокированных карточек
-                card.onclick = () => openContentPage(item);
+                card.onclick = () => {
+                    if (item.requiresPassword) {
+                        // Для карточки с паролем
+                        showPasswordOverlay(item);
+                    } else {
+                        // Для обычных карточек
+                        openContentPage(item);
+                    }
+                };
                 
                 // Эффект нажатия для разблокированных
                 card.addEventListener('mousedown', () => {
@@ -1092,10 +1731,278 @@
 
             container.appendChild(card);
             
-            // Запускаем снег на карточках
-            setTimeout(() => {
-                startCardSnow(item.day);
-            }, 500 + index * 100);
+            // Запускаем снег на карточках (только для не-скрытых карточек и не для карточки 1 января)
+            if (!(item.day === 1 && item.month === 0)) {
+                setTimeout(() => {
+                    startCardSnow(item.day);
+                }, 500 + index * 100);
+            }
+        });
+
+        // --- Функция показа окна с паролем для карточки ---
+        function showPasswordOverlay(item) {
+            currentPasswordItem = item;
+            passwordInput.value = '';
+            passwordError.classList.remove('show');
+            passwordContainer.classList.add('active');
+            passwordInput.focus();
+            
+            // Блокируем скролл основной страницы
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // --- Функция скрытия окна с паролем для карточки ---
+        function hidePasswordOverlay() {
+            passwordContainer.classList.remove('active');
+            passwordError.classList.remove('show');
+            
+            // Восстанавливаем скролл основной страницы
+            document.body.style.overflow = '';
+        }
+        
+        // --- Функция проверки пароля для карточки ---
+        function checkPassword() {
+            const input = passwordInput.value.trim().toLowerCase();
+            
+            if (input === PASSWORD) {
+                // Пароль верный, скрываем окно с паролем и открываем контент
+                hidePasswordOverlay();
+                if (currentPasswordItem) {
+                    openContentPage(currentPasswordItem);
+                    
+                    // После успешного ввода пароля показываем карточку 1 января
+                    showJanuary1Card();
+                }
+            } else {
+                // Пароль неверный, показываем ошибку
+                passwordError.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+        
+        // --- Функция показа окна с паролем для подарка ---
+        function openGiftPasswordOverlay() {
+            // Проверяем, это секретная карточка или обычная
+            if (currentItemForGift && currentItemForGift.day === 1 && currentItemForGift.month === 0) {
+                // Только для секретной карточки показываем окно пароля
+                giftPasswordInput.value = '';
+                giftPasswordError.classList.remove('show');
+                giftPasswordContainer.classList.add('active');
+                giftPasswordInput.focus();
+                
+                contentPage.style.overflow = 'hidden';
+            } else {
+                // Для обычных карточек открываем подарок сразу
+                revealGift(contentGift);
+            }
+        }
+        
+        // --- Функция скрытия окна с паролем для подарка ---
+        function hideGiftPasswordOverlay() {
+            giftPasswordContainer.classList.remove('active');
+            giftPasswordError.classList.remove('show');
+            
+            // Восстанавливаем скролл на странице контента
+            contentPage.style.overflow = 'auto';
+        }
+        
+        // --- Функция проверки пароля для подарка ---
+        function checkGiftPassword() {
+            const input = giftPasswordInput.value.trim();
+            
+            if (input === GIFT_PASSWORD) {
+                // Пароль верный, скрываем окно с паролем и открываем подарок
+                hideGiftPasswordOverlay();
+                revealGift(contentGift);
+            } else {
+                // Пароль неверный, показываем ошибку
+                giftPasswordError.classList.add('show');
+                giftPasswordInput.value = '';
+                giftPasswordInput.focus();
+            }
+        }
+        
+        // --- Функция показа карточки 1 января ---
+        function showJanuary1Card() {
+            if (january1Card) {
+                // Убираем класс скрытия
+                january1Card.classList.remove('hidden-card');
+                january1Card.classList.remove('locked');
+                
+                // Добавляем обработчики событий
+                january1Card.onclick = () => {
+                    // Показываем окно с паролем
+                    const januaryItem = adventData.find(item => item.day === 1 && item.month === 0);
+                    if (januaryItem) {
+                        showPasswordOverlay(januaryItem);
+                    }
+                };
+                
+                // Эффект появления карточки
+                january1Card.style.animation = 'float 3.5s ease-in-out infinite';
+                january1Card.style.opacity = '1';
+                january1Card.style.transform = 'scale(1)';
+                
+                // Прячем секретную кнопку
+                secretButton.classList.remove('visible');
+                
+                // Анимация появления карточки
+                january1Card.animate([
+                    { transform: 'scale(0.8)', opacity: 0 },
+                    { transform: 'scale(1.05)', opacity: 1 },
+                    { transform: 'scale(1)', opacity: 1 }
+                ], {
+                    duration: 600,
+                    easing: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)'
+                });
+            }
+        }
+        
+        // --- Функция показа секретной кнопки ---
+        function checkAndShowSecretButton() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentDay = now.getDate();
+            
+            // Показываем кнопку только если сейчас декабрь и после 31-го числа
+            // или если уже январь
+            if ((currentMonth === START_MONTH && currentDay >= 31) || currentMonth === 0) {
+                secretButton.classList.add('visible');
+            }
+        }
+        
+        // --- Функции для текстовой навигации секретной карточки ---
+        function initSecretTextPages(texts) {
+            // Очищаем предыдущие страницы
+            secretTextPages.innerHTML = '';
+            totalTextPages = texts.length;
+            currentTextIndex = 0;
+            
+            // Создаем страницы с текстом
+            texts.forEach((text, index) => {
+                const textPage = document.createElement('div');
+                textPage.className = 'secret-text-page';
+                textPage.id = `secret-text-${index + 1}`;
+                textPage.innerHTML = text;
+                
+                if (index === 0) {
+                    textPage.classList.add('active');
+                }
+                
+                secretTextPages.appendChild(textPage);
+            });
+            
+            // Показываем блок с текстовыми страницами
+            secretTextPages.style.display = 'block';
+            contentText.style.display = 'none';
+            
+            // Показываем навигацию
+            textNavigation.style.display = 'flex';
+            
+            // Обновляем счетчик
+            updateTextCounter();
+            
+            // Обновляем состояние кнопок
+            updateTextButtons();
+        }
+        
+        function nextSecretText() {
+            if (currentTextIndex < totalTextPages - 1) {
+                // Скрываем текущую страницу
+                const currentPage = document.getElementById(`secret-text-${currentTextIndex + 1}`);
+                if (currentPage) {
+                    currentPage.classList.remove('active');
+                }
+                
+                // Показываем следующую страницу
+                currentTextIndex++;
+                const nextPage = document.getElementById(`secret-text-${currentTextIndex + 1}`);
+                if (nextPage) {
+                    nextPage.classList.add('active');
+                }
+                
+                // Обновляем счетчик и кнопки
+                updateTextCounter();
+                updateTextButtons();
+            }
+        }
+        
+        function prevSecretText() {
+            if (currentTextIndex > 0) {
+                // Скрываем текущую страницу
+                const currentPage = document.getElementById(`secret-text-${currentTextIndex + 1}`);
+                if (currentPage) {
+                    currentPage.classList.remove('active');
+                }
+                
+                // Показываем предыдущую страницу
+                currentTextIndex--;
+                const prevPage = document.getElementById(`secret-text-${currentTextIndex + 1}`);
+                if (prevPage) {
+                    prevPage.classList.add('active');
+                }
+                
+                // Обновляем счетчик и кнопки
+                updateTextCounter();
+                updateTextButtons();
+            }
+        }
+        
+        function updateTextCounter() {
+            textCounter.textContent = `${currentTextIndex + 1}/${totalTextPages}`;
+        }
+        
+        function updateTextButtons() {
+            prevTextBtn.disabled = currentTextIndex === 0;
+            nextTextBtn.disabled = currentTextIndex === totalTextPages - 1;
+        }
+        
+        // Обработка нажатия Enter в поле пароля для карточки
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // Обработка нажатия Enter в поле пароля для подарка
+        giftPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkGiftPassword();
+            }
+        });
+        
+        // Обработка клика по секретной кнопке
+        secretButton.addEventListener('click', () => {
+            // Показываем карточку 1 января
+            showJanuary1Card();
+        });
+        
+        // Закрытие окна пароля по клику на фон
+        passwordContainer.addEventListener('click', (e) => {
+            if (e.target === passwordContainer) {
+                hidePasswordOverlay();
+            }
+        });
+        
+        // Закрытие окна пароля для подарка по клику на фон
+        giftPasswordContainer.addEventListener('click', (e) => {
+            if (e.target === giftPasswordContainer) {
+                hideGiftPasswordOverlay();
+            }
+        });
+        
+        // Обработка клавиш клавиатуры для текстовой навигации
+        document.addEventListener('keydown', (e) => {
+            if (isContentPageOpen && isSecretCard) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    nextSecretText();
+                    e.preventDefault();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    prevSecretText();
+                    e.preventDefault();
+                }
+            }
         });
 
         // --- Функция создания снега на карточке ---
@@ -1207,8 +2114,8 @@
             }
             
             if (photoList.length > 1) {
-				        initSwipe();
-				    }
+                initSwipe();
+            }
         }
 
         // Функция переключения фото
@@ -1243,6 +2150,10 @@
         // --- Функции для специальной страницы с контентом ---
         function openContentPage(item) {
             isContentPageOpen = true;
+            currentItemForGift = item;
+            
+            // Определяем, это секретная карточка или нет
+            isSecretCard = (item.day === 1 && item.month === 0);
             
             // Сохраняем позицию прокрутки основной страницы
             scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
@@ -1254,8 +2165,22 @@
             document.body.style.top = `-${scrollPosition}px`;
 
             // Показываем контент
-            contentDate.innerText = item.day + " Декабря";
-            contentText.innerText = item.text;
+            if (item.month === 0) {
+                contentDate.innerText = "1 Января";
+            } else {
+                contentDate.innerText = item.day + " Декабря";
+            }
+            
+            // Если это секретная карточка - инициализируем текстовые страницы
+            if (isSecretCard && item.texts && Array.isArray(item.texts)) {
+                initSecretTextPages(item.texts);
+            } else {
+                // Для обычных карточек - обычный текст
+                contentText.innerHTML = item.text.replace(/\n/g, '<br>');
+                contentText.style.display = 'block';
+                secretTextPages.style.display = 'none';
+                textNavigation.style.display = 'none';
+            }
             
             // Устанавливаем текст подарка в скрытом состоянии
             const giftRealText = contentGift.querySelector('.gift-real-text');
@@ -1278,6 +2203,48 @@
             // Инициализируем галерею
             initPhotoGallery(item);
             
+            // Специальная обработка для секретной карточки 1 января
+            if (isSecretCard) {
+                // Скрываем галерею
+                const photo = document.getElementById('content-img');
+                const dotsContainer = document.getElementById('gallery-dots');
+                if (photo) photo.style.display = 'none';
+                if (dotsContainer) dotsContainer.style.display = 'none';
+                
+                // Увеличиваем шрифт даты
+                contentDate.style.fontSize = '2.5rem';
+                contentDate.style.color = '#ffecd1';
+                contentDate.style.textShadow = '0 0 15px rgba(255, 236, 209, 0.5)';
+                contentDate.style.marginTop = '20px';
+                
+                // Стилизуем подарок для секретной карточки
+                contentGift.style.background = 'rgba(142, 68, 173, 0.9)';
+                contentGift.style.border = '3px dashed #ffecd1';
+                contentGift.style.color = '#ffecd1';
+                contentGift.style.fontSize = '1.3rem';
+                contentGift.style.marginTop = '20px';
+                
+                // Добавляем специальный класс для секретной карточки
+                contentPage.classList.add('secret-content');
+            } else {
+                // Сбрасываем стили для обычных карточек
+                contentPage.classList.remove('secret-content');
+                
+                // Сбрасываем стили даты
+                contentDate.style.fontSize = '';
+                contentDate.style.color = '';
+                contentDate.style.textShadow = '';
+                contentDate.style.marginTop = '';
+                contentDate.style.marginBottom = '';
+                
+                // Сбрасываем стили подарка
+                contentGift.style.background = '';
+                contentGift.style.border = '';
+                contentGift.style.color = '';
+                contentGift.style.fontSize = '';
+                contentGift.style.marginTop = '';
+            }
+            
             // Показываем страницу с контентом
             contentPage.classList.add('active');
             
@@ -1287,74 +2254,135 @@
             }, 10);
             
             if (navigator.vibrate) {
-				        navigator.vibrate(20);
-				    }
+                navigator.vibrate(20);
+            }
         }
 				
-				function revealGift(element) {
-				    if (element.classList.contains('revealed')) return;
-				    
-				    // Находим элементы внутри
-				    const hiddenText = element.querySelector('.gift-hidden-text');
-				    const realText = element.querySelector('.gift-real-text');
-				    
-				    // Показываем реальный текст
-				    if (hiddenText) hiddenText.style.display = 'none';
-				    if (realText) realText.style.display = 'block';
-				    
-				    // Меняем стиль
-				    element.classList.remove('hidden');
-				    element.classList.add('revealed');
-				    
-				    if (navigator.vibrate) {
-				        navigator.vibrate(20);
-				    }
-				}
-				
-				// Добавляем функцию для обработки свайпа
-				function initSwipe() {
-				    const photo = document.getElementById('content-img');
-				    if (!photo) return;
-				    
-				    let startX = 0;
-				    let endX = 0;
-				    const minSwipeDistance = 50;
-				    
-				    photo.addEventListener('touchstart', (e) => {
-				        startX = e.touches[0].clientX;
-				    });
-				    
-				    photo.addEventListener('touchmove', (e) => {
-				        endX = e.touches[0].clientX;
-				    });
-				    
-				    photo.addEventListener('touchend', () => {
-				        if (startX === 0 || endX === 0) return;
-				        
-				        const diff = startX - endX;
-				        
-				        if (Math.abs(diff) > minSwipeDistance) {
-				            if (diff > 0) {
-				                // Свайп влево - следующий слайд
-				                const nextIndex = (currentPhotoIndex + 1) % photoList.length;
-				                switchPhoto(nextIndex);
-				            } else {
-				                // Свайп вправо - предыдущий слайд
-				                const prevIndex = (currentPhotoIndex - 1 + photoList.length) % photoList.length;
-				                switchPhoto(prevIndex);
-				            }
-				        }
-				        
-				        // Сбрасываем значения
-				        startX = 0;
-				        endX = 0;
-				    });
-				}
-				
+        function revealGift(element) {
+            if (element.classList.contains('revealed')) return;
+            
+            // Находим элементы внутри
+            const hiddenText = element.querySelector('.gift-hidden-text');
+            const realText = element.querySelector('.gift-real-text');
+            
+            // Показываем реальный текст
+            if (hiddenText) hiddenText.style.display = 'none';
+            if (realText) realText.style.display = 'block';
+            
+            // Меняем стиль
+            element.classList.remove('hidden');
+            element.classList.add('revealed');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+        }
+        
+        // Добавляем функцию для обработки свайпа
+        function initSwipe() {
+            const photo = document.getElementById('content-img');
+            if (!photo) return;
+            
+            let startX = 0;
+            let endX = 0;
+            const minSwipeDistance = 50;
+            
+            photo.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+            
+            photo.addEventListener('touchmove', (e) => {
+                endX = e.touches[0].clientX;
+            });
+            
+            photo.addEventListener('touchend', () => {
+                if (startX === 0 || endX === 0) return;
+                
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) > minSwipeDistance) {
+                    if (diff > 0) {
+                        // Свайп влево - следующий слайд
+                        const nextIndex = (currentPhotoIndex + 1) % photoList.length;
+                        switchPhoto(nextIndex);
+                    } else {
+                        // Свайп вправо - предыдущий слайд
+                        const prevIndex = (currentPhotoIndex - 1 + photoList.length) % photoList.length;
+                        switchPhoto(prevIndex);
+                    }
+                }
+                
+                // Сбрасываем значения
+                startX = 0;
+                endX = 0;
+            });
+        }
+        
+        // Добавляем свайпы для текстовой навигации
+        function initTextSwipe() {
+            if (!isSecretCard) return;
+            
+            let startX = 0;
+            let endX = 0;
+            const minSwipeDistance = 50;
+            
+            contentPage.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+            
+            contentPage.addEventListener('touchmove', (e) => {
+                endX = e.touches[0].clientX;
+            });
+            
+            contentPage.addEventListener('touchend', () => {
+                if (startX === 0 || endX === 0) return;
+                
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) > minSwipeDistance) {
+                    if (diff > 0) {
+                        // Свайп влево - следующий текст
+                        nextSecretText();
+                    } else {
+                        // Свайп вправо - предыдущий текст
+                        prevSecretText();
+                    }
+                }
+                
+                // Сбрасываем значения
+                startX = 0;
+                endX = 0;
+            });
+        }
+        
         function closeContentPage() {
             isContentPageOpen = false;
+            isSecretCard = false;
+            currentItemForGift = null;
             
-            // Скрываем страницу с контента
+            // Убираем класс секретного контента
+            contentPage.classList.remove('secret-content');
+            
+            // Сбрасываем стили даты
+            contentDate.style.fontSize = '';
+            contentDate.style.color = '';
+            contentDate.style.textShadow = '';
+            contentDate.style.marginTop = '';
+            contentDate.style.marginBottom = '';
+            
+            // Сбрасываем стили подарка
+            contentGift.style.background = '';
+            contentGift.style.border = '';
+            contentGift.style.color = '';
+            contentGift.style.fontSize = '';
+            contentGift.style.marginTop = '';
+            
+            // Скрываем текстовую навигацию
+            secretTextPages.style.display = 'none';
+            textNavigation.style.display = 'none';
+            contentText.style.display = 'block';
+            
+            // Скрываем страницу с контентом
             contentPage.classList.remove('active');
             
             // Восстанавливаем скролл основной страницы
@@ -1407,6 +2435,9 @@
         
         // Также обновляем при загрузке страницы
         window.addEventListener('load', updateCountdownAndMessage);
+        
+        // Проверяем, нужно ли показывать секретную кнопку
+        checkAndShowSecretButton();
 
         // Добавляем плавный переход для фото
         const style = document.createElement('style');
