@@ -1868,7 +1868,7 @@
             
             // Показываем кнопку только если сейчас декабрь и после 31-го числа
             // или если уже январь
-            if ((currentMonth === START_MONTH && currentDay >= 31) || currentMonth === 0) {
+            if ((currentMonth === START_MONTH && currentDay > 31) || currentMonth === 0) {
                 secretButton.classList.add('visible');
             }
         }
