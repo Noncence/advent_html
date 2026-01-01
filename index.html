@@ -1502,15 +1502,19 @@
         // Проверяет, доступна ли карточка для данного дня
         function isCardAvailable(cardDay, cardMonth = START_MONTH) {
             const now = new Date();
-            const currentYear = now.getFullYear();
             const currentMonth = now.getMonth(); // 0-11
             const currentDay = now.getDate();
             
-            // Если карточка для 1 января
+            // Если карточка для 1 января (секретная карточка)
             if (cardMonth === 0 && cardDay === 1) {
-                // Карточка 1 января всегда недоступна при первой загрузке
-                // Она станет доступной только через специальную кнопку
+                // Секретная карточка скрыта по умолчанию, доступна только через кнопку и пароль
                 return false;
+            }
+            
+            // Если сейчас январь (месяц 0) - все обычные карточки декабрьские доступны
+            if (currentMonth === 0) {
+                // В январе все карточки с 22 по 31 декабря должны быть доступны
+                return true;
             }
             
             // Если текущий месяц раньше декабря (ноябрь или ранее)
@@ -1525,8 +1529,9 @@
                 return currentDay >= cardDay && currentDay >= START_DAY;
             }
             
-            // Если текущий месяц позже декабря (январь следующего года)
+            // Если текущий месяц после декабря (январь или позже)
             // Все карточки становятся доступными
+            // Это условие нужно для случаев, если код запущен в январе следующего года
             return true;
         }
         
@@ -1536,12 +1541,17 @@
             const currentMonth = now.getMonth();
             const currentDay = now.getDate();
             
+            // Если сейчас январь - календарь уже начался (и закончился)
+            if (currentMonth === 0) {
+                return true;
+            }
+            
             // Если текущий месяц - декабрь и день >= 22
             if (currentMonth === START_MONTH && currentDay >= START_DAY) {
                 return true;
             }
             
-            // Если месяц после декабря
+            // Если месяц после декабря (в следующем году)
             if (currentMonth > START_MONTH) {
                 return true;
             }
@@ -1555,7 +1565,12 @@
             const currentMonth = now.getMonth();
             const currentDay = now.getDate();
             
-            // Если не декабрь, показываем последний доступный день
+            // Если январь
+            if (currentMonth === 0) {
+                return "С Новым Годом! Все дни адвента открыты!";
+            }
+            
+            // Если не декабрь
             if (currentMonth < START_MONTH) {
                 return "Ждём начала декабря!";
             }
@@ -1567,7 +1582,7 @@
             
             // Если после декабря
             if (currentMonth > START_MONTH) {
-                return "Все дни открыты! До встречи)";
+                return "Все дни открыты!";
             }
             
             // Если сейчас декабрь и день >= 22
@@ -1868,7 +1883,7 @@
             
             // Показываем кнопку только если сейчас декабрь и после 31-го числа
             // или если уже январь
-            if ((currentMonth === START_MONTH && currentDay > 31) || currentMonth === 0) {
+            if ((currentMonth === START_MONTH && currentDay >= 31) || currentMonth === 0) {
                 secretButton.classList.add('visible');
             }
         }
